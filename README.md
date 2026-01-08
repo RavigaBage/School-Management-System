@@ -1,36 +1,142 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# School Management System
 
-## Getting Started
+A comprehensive school management platform for academic and administrative operations.
 
-First, run the development server:
+## Overview
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+Modern web application built with a React frontend and Django REST API backend. Designed to streamline student records, academic management, financial tracking, and communication.
+
+## Tech Stack
+
+| Layer | Technology |
+|-------|------------|
+| Frontend | React, TypeScript, Vite, Tailwind CSS, shadcn/ui |
+| Backend | Django, Django REST Framework |
+| Database | SQLite (dev) / PostgreSQL (prod) |
+| Deployment | Docker, GitHub Actions, VPS |
+
+## Project Structure
+```
+├── frontend/          # React SPA
+│   ├── src/
+│   │   ├── components/
+│   │   ├── pages/
+│   │   └── lib/
+│   └── package.json
+├── backend/           # Django API
+│   ├── apps/
+│   ├── config/
+│   └── requirements.txt
+└── .github/workflows/ # CI/CD
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Quick Start
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Prerequisites
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- Node.js 20+
+- Python 3.12+
+- Docker (optional)
 
-## Learn More
+### Frontend
+```bash
+cd frontend
+npm install
+npm run dev
+```
 
-To learn more about Next.js, take a look at the following resources:
+Runs at `http://localhost:5173`
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### Backend
+```bash
+cd backend
+python -m venv .venv
+source .venv/bin/activate  # Windows: .venv\Scripts\activate
+pip install -r requirements.txt
+cp .env.example .env
+python manage.py migrate
+python manage.py runserver
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Runs at `http://localhost:8000`
 
-## Deploy on Vercel
+### Docker (Backend)
+```bash
+cd backend
+cp .env.example .env
+docker compose up
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## API Documentation
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Once backend is running:
+
+- Swagger UI: `http://localhost:8000/api/docs/`
+- OpenAPI Schema: `http://localhost:8000/api/schema/`
+
+## Environment Variables
+
+### Backend (.env)
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `DJANGO_SECRET_KEY` | Secret key for Django | Required |
+| `DEBUG` | Debug mode | `True` |
+| `ALLOWED_HOSTS` | Allowed hostnames | `localhost,127.0.0.1` |
+| `CORS_ALLOWED_ORIGINS` | Frontend URL | `http://localhost:5173` |
+
+## Core Modules
+
+- **Student Management** – Enrollment, profiles, academic history
+- **Staff Management** – Registration, assignments, attendance
+- **Academic Management** – Classes, subjects, timetables
+- **Attendance** – Daily tracking, reports, alerts
+- **Examinations** – Assessments, grading, report cards
+- **Fees** – Billing, payments, financial reports
+- **Communications** – Announcements, messaging, notifications
+
+## Development
+
+### Running Tests
+```bash
+# Backend
+cd backend
+python manage.py test
+
+# Frontend
+cd frontend
+npm run test
+```
+
+### Linting
+```bash
+# Backend
+pip install ruff
+ruff check .
+
+# Frontend
+npm run lint
+```
+
+## Deployment
+
+See [docs/SETUP.md](docs/SETUP.md) for full deployment guide.
+
+### Quick Deploy
+
+1. Push to `main` branch
+2. GitHub Actions builds Docker image
+3. Image pushed to GitHub Container Registry
+4. Auto-deploys to VPS via SSH
+
+## Contributing
+
+1. Fork the repository
+2. Create feature branch (`git checkout -b feature/name`)
+3. Commit changes (`git commit -m "Add feature"`)
+4. Push to branch (`git push origin feature/name`)
+5. Open a Pull Request
+
+## License
+
+MIT
