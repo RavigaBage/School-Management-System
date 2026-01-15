@@ -35,7 +35,8 @@ class SmsUserManager(BaseUserManager):
         )
         user.set_password(password)  
         user.save(using=self._db)
-        return user
+        
+        return user, None
 
     def create_superuser(self, username, password, email=None, **extra_fields):
         extra_fields.setdefault("is_staff", True)
@@ -57,7 +58,6 @@ class SmsUser(AbstractBaseUser, PermissionsMixin):
     role = models.CharField(max_length=20, choices=ROLE_CHOICES)
     created_at = models.DateTimeField(default=timezone.now)
 
-
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
 
@@ -68,3 +68,16 @@ class SmsUser(AbstractBaseUser, PermissionsMixin):
 
     def __str__(self):
         return f"{self.username} ({self.role})"
+
+
+class LoginToken(models.Model):
+    user = models.OneToOneField(
+        SmsUser,
+        on_delete=models.CASCADE,
+        related_name="login_token"
+    )
+    token = models.TextField()
+    created_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"{self.user.username} active token"

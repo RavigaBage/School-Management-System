@@ -12,8 +12,11 @@ urlpatterns = [
     # Timetable views
     path('class/<int:class_id>/', views.get_class_timetable, name='view_class_timetable'),
     path('teacher/<int:teacher_id>/', views.get_teacher_timetable, name='view_teacher_timetable'),
+    path('subjects/', views.teacher_subjects_view, name='teacher_subjects'),
     #path('term/<int:term_id>/', views.get_term_timetable, name='view_term_timetable'),
 
     # Optional: conflict resolution check
     #path('entries/<int:entry_id>/check_conflict/', views.check_entry_conflict, name='check_entry_conflict'),
+
+    
 ]

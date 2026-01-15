@@ -4,6 +4,8 @@ from rest_framework.response import Response
 from rest_framework import status
 from ratelimit import limits
 from rest_framework_simplejwt.tokens import RefreshToken
+from .models import SmsUser,LoginToken
+from django.http import JsonResponse
 
 FIFTEEN_MINUTES = 900
 API_KEY = "MY_SUPER_SECRET_KEY"
@@ -15,25 +17,40 @@ def login_view(request):
     password = request.data.get("password")
 
     user = authenticate(username=username, password=password)
-    if user:
-        refresh = RefreshToken.for_user(user)
-        return Response({
-            "responseCode": 0,
-            "responseMessage": "Logged in successfully",
-            "data": {
-                "access": str(refresh.access_token),
-                "refresh": str(refresh),
-            },
-            "dataCount": 2,
-        })
-    else:
+
+    if not user:
         return Response({
             "responseCode": 4,
             "responseMessage": "Invalid username or password",
             "data": [],
             "dataCount": 0,
         }, status=status.HTTP_401_UNAUTHORIZED)
+    
+    profile_data = {
+        "id": user.id,
+        "username": user.username,
+        "role": user.role,
+    }
 
+    refresh = RefreshToken.for_user(user)
+    access_token = str(refresh.access_token)
+
+    # Store token (important for middleware validation)
+    LoginToken.objects.update_or_create(
+        user=user,
+        defaults={"token": access_token}
+    )
+
+    return Response({
+        "responseCode": 0,
+        "responseMessage": "Logged in successfully",
+        "data": {
+            "access": access_token,
+            "refresh": str(refresh),
+            "profile": profile_data,
+        },
+        "dataCount": 2,
+    })
 
 def jwt_request(payload: dict):
     refresh = RefreshToken()
@@ -83,3 +100,18 @@ def get_jwt_token_by_client_id(request):
         "data": tokens,
         "dataCount": len(tokens),
     })
+@api_view(["GET"])
+def users_client_view(request):
+    users = SmsUser.objects.all().order_by("-created_at")
+
+    users_list = []
+    for u in users:
+        users_list.append({
+            "id": u.id,
+            "username": u.username,
+            "email": u.email,
+            "role": u.role,
+            "created_at": u.created_at.strftime("%Y-%m-%d %H:%M:%S")
+        })
+
+    return JsonResponse(users_list, safe=False)
